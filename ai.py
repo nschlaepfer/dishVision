@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import tensorflow as tf
 import tensorflow_hub as hub
+from debug_window import update_counters
 
 # Disable eager execution
 tf.compat.v1.disable_eager_execution()
@@ -42,9 +43,6 @@ def main():
     washing_hands_counter = 0
     washing_dishes_counter = 0
 
-    # Initialize a frame counter
-    frame_counter = 0
-
     with tf.compat.v1.Session() as sess:  # Use tf.compat.v1.Session() instead of tf.Session()
         sess.run(tf.compat.v1.global_variables_initializer())
         while True:
@@ -77,22 +75,21 @@ def main():
                 # Map the predicted action index to its name
                 predicted_action_name = action_names[predicted_action_val[0]]
 
+                # Display the current prediction on the webcam feed
+                cv2.putText(frame, f'{predicted_action_name}', (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+
                 # Increment counters if the predicted action is 'washing hands' or 'washing dishes'
                 if predicted_action_name == 'washing hands':
                     washing_hands_counter += 1
+                    update_counters(washing_hands_counter, washing_dishes_counter)  # Update the debug window
                 elif predicted_action_name == 'washing dishes':
                     washing_dishes_counter += 1
+                    update_counters(washing_hands_counter, washing_dishes_counter)  # Update the debug window
 
                 # Clear the frames list to start a new sequence
                 frames = []
 
-            # Display the predicted action name on the screen every 100 frames
-            if frame_counter % 100 == 0:
-                cv2.putText(frame, f'Washing hands: {washing_hands_counter}', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-                cv2.putText(frame, f'Washing dishes: {washing_dishes_counter}', (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
 
-            # Increment the frame counter
-            frame_counter += 1
 
             # Display the frame
             cv2.imshow('Video', frame)
