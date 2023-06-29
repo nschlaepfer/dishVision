@@ -1,0 +1,27 @@
+# DishVision Technical Specification
+
+## Overview
+
+DishVision is an application that uses computer vision and machine learning to monitor and classify dishwashing behavior. The application captures video from a webcam, processes the video frames, and uses a pre-trained model to classify the user's actions. The classified actions are then displayed on the screen, and the user is provided with feedback based on their behavior.
+
+## Design and Architecture
+
+### Video Capture
+
+The application uses OpenCV to capture video from the user's webcam. The video frames are resized and preprocessed before being passed to the machine learning model.
+
+### Machine Learning Model
+
+The application uses a pre-trained model from TensorFlow Hub to classify the user's actions. The model is trained on a large and diverse dataset of dishwashing videos, and is capable of classifying actions as 'leaving dishes in the sink', 'cleaning dishes', or 'putting dishes into a dishwasher'.
+
+### Feedback Mechanism
+
+The application provides feedback to the user based on their classified actions. The feedback is displayed on the screen and is designed to be polite, positive, and motivating.
+
+### User Interface
+
+The application's user interface consists of the video feed from the webcam, the classified action, and the provided feedback. The interface is designed to be simple and intuitive.
+
+## Implementation Details
+
+The application is implemented in Python, using libraries such as OpenCV, TensorFlow, and TensorFlow Hub. The code is organized into modules, with each module responsible for a specific part of the application's functionality. The code follows good coding practices, is well-commented, and handles errors and exceptions gracefully.
