@@ -39,10 +39,15 @@ def main():
     # Initialize a list to hold the sequence of frames
     frames = []
 
-    # Initialize counters
+    # Initialize counters and previous prediction
     washing_hands_counter = 0
     washing_dishes_counter = 0
     other_actions_counter = 0
+    previous_prediction = ""
+    predicted_action_name = ""  # Initialize predicted_action_name
+
+    # Open a file for writing the log
+    log_file = open('predictions_log.txt', 'w')
 
     with tf.compat.v1.Session() as sess:  # Use tf.compat.v1.Session() instead of tf.Session()
         sess.run(tf.compat.v1.global_variables_initializer())
@@ -76,10 +81,19 @@ def main():
                 # Map the predicted action index to its name
                 predicted_action_name = action_names[predicted_action_val[0]]
 
-                # Display the current prediction on the webcam feed
-                cv2.putText(frame, f'{predicted_action_name}', (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                # Store the current prediction as the previous prediction
+                previous_prediction = predicted_action_name
 
-               # Increment counters if the predicted action is 'washing hands' or 'washing dishes'
+                # Get the probability of the predicted action
+                predicted_probability = probabilities_val[0, predicted_action_val[0]]
+
+                # Display the current prediction and its probability on the webcam feed
+                cv2.putText(frame, f'{predicted_action_name} ({predicted_probability:.2f})', (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+
+                # Display the previous prediction on the webcam feed
+                cv2.putText(frame, f'Previous: {previous_prediction}', (10, 120), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)
+
+                # Increment counters if the predicted action is 'washing hands' or 'washing dishes'
                 if predicted_action_name == 'washing hands':
                     washing_hands_counter += 1
                 elif predicted_action_name == 'washing dishes':
@@ -87,11 +101,11 @@ def main():
                 else:
                     other_actions_counter += 1
 
-                update_counters(washing_hands_counter, washing_dishes_counter, other_actions_counter)  # Update the debug window
+                # Update the counters and the debug window
+                update_counters(washing_hands_counter, washing_dishes_counter, other_actions_counter, predicted_probability)
 
                 # Clear the frames list to start a new sequence
                 frames = []
-
 
 
             # Display the frame
@@ -100,6 +114,9 @@ def main():
             # Break the loop if 'q' is pressed
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
+
+    # Close the log file
+    log_file.close()
 
     # Release the webcam and close the windows
     cap.release()
